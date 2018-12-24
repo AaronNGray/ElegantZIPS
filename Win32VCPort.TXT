@@ -1,0 +1,509 @@
+			Win32 Elegant port history
+			==========================
+
+Author: Aaron N. Gray - e-mail: AaronGray@beeb.net
+
+Porting Elegant 7.1 to Windows 2000 using Visual C++ Version 6.00 command
+line compiler and linker.
+
+Win32 Port Instillation
+=======================
+
+Unzip Phillips Elegant Source :-
+
+    unzip C7.1.src.tar.gz to c:\Elegant
+
+Unzip Win32 port zips :-
+
+    unzip C7.1_Win32EXE.zip to c:\Elegant
+    unzip C7.1_Win32LIB.zip to c:\Elegant
+
+Create elegants environment batch file "elegant.bat":-
+
+    setup c:\Elegant
+
+If you installed it at a different root type :-
+
+    setup <NewRootDirectory>
+
+This creates a file called "environment.bat" this initializes Elegants
+environment variables.
+
+You may move enviromnet.bat to a directory such as \bat which is on your
+path and rename as "elegant.bat" :-
+
+    move environment.bat \bat\elegant.bat
+
+execute it :-
+
+    elegant
+
+This adds <ElegantRoot>\bin\Win32 to the path, so elegants commands
+are accessable from the command line. Seting environment variables :-
+    path=<ElegantRoot>\bin\Win32;%path%
+    lib=<ElegantRoot>\lib\Win32;%lib%
+    ElegantRoot=<ElegantRoot>
+    ElegantArch=Win32
+
+Making Elegant, its libraries and tools
+=======================================
+
+The following stages are not really necessary unless you are interested, or are going
+to modify Elegant, or its tools or libraries.
+
+Unzip Win32 port zips :-
+
+    unzip C7.1_Win32MAK.zip to c:\Elegant
+
+And optionally if you have not unziped 'C7.1.src.tar.gz' you may need :-
+
+    unzip C7.1_Win32SRC.zip to c:\Elegant
+
+Type :-
+
+    MakeTree
+
+This generates the empty directories used for compilation.
+
+To make elegant, its libraries, and tools, on your machine type :-
+
+    make all
+
+To install them type :-
+
+    install all
+
+To make just the tools type :-
+
+    make tools
+
+To make just the libraries type :-
+
+    make libs
+
+To install either type install followed by either "tools" or "libs".
+
+To make an individul library, or tool, change into its root directory and
+type :-
+
+    nmake -fmakefile.mak
+
+To clean a sub project type
+
+    nmake -fmakefile.mak clean
+
+Or to clean everything including the target and compiler cache files type :-
+
+    nmake -fmakefile.mak cleanall
+
+
+Win32 Port Files
+================
+
+\
+    Win32VCPort.txt - This file.
+    setup.bat - Makes CMD Environment batch file and directory structure.
+    make.bat
+    install.bat
+    makefile - Root Makefile
+    bin\
+        Win32
+            Elegant.exe
+            ScanGen.exe
+            Front.exe
+            ElegantMake.exe
+            CMake.exe
+            BNF.exe
+            Diagrams.exe
+    lib\
+        preludes\
+            makefile
+        rts\
+            makefile
+            ansi.h
+            Machines.h
+            DirStream.h
+            SystemTypes.h
+            ts_Win32.h
+        generic\
+            makefile
+            files.spec
+            files.impl
+        sd\
+            makefile
+        Win32\
+            generic.lib
+            preludes.lib
+            rts.lib
+            sd.lib
+    tools\
+        Elegant\
+            makefile
+            cgn\version.h
+            cgn\GenExpr.impl
+        ScanGen
+            makefile
+            cgn\version.h
+        Front
+            makefile
+            cgn\version.h
+        ElegantMake
+            makefile
+            cgn\version.h
+        CMake
+            makefile
+            cgn\version.h
+        BNF
+            makefile
+            cgn\version.h
+        Diagrams
+            makefile
+            cgn\version.h
+
+Directories
+===========
+
+\Elegant\
+    bin\
+	Win32 - Elegant Win32 binary files
+
+    lib\
+    	rts\
+	    Win32 - Win32 object files
+    	sd\
+	    Win32 - Win32 object files
+    	preludes\
+	    Win32 - Win32 object files
+    	generic\
+	    Win32 - Win32 object files
+
+    tools\
+	Elegant\
+	    Grammar
+	    CGN
+	    Generated
+	    Domain
+	    Win32 - Win32 object files
+	ElegantMake\
+	    Grammar
+	    CGN
+	    Generated
+	    Domain
+	    Win32 - Win32 object files
+	CMake\
+	    Grammar
+	    CGN
+	    Generated
+	    Domain
+	    Win32 - Win32 object files
+	Front\
+	    Grammar
+	    CGN
+	    Generated
+	    Domain
+	    Win32 - Win32 object files
+	BNF\
+	    Grammar
+	    CGN
+	    Generated
+	    Domain
+	    Win32 - Win32 object files
+
+Environment
+===========
+
+path=c:\Elegant\bin\Win32;%path%
+lib=c:\Elegant\lib\Win32;%lib%
+ElegantRoot=c:\Elegant
+ElegantArch=c:\Elegant
+
+
+History
+=======
+
+port Libraries
+    ported from C Source
+
+    Add proper WIN32 support
+
+    	Elegant\lib\rts\machines.h
+	    	line 37:
+		    	#define Machines_Win32	6
+			    #define Machines_MAX	Machines_Win32
+    		line 76:
+	    		#ifdef WIN32
+		    	#define Machines_ThisMachine  Machines_Win32
+			    #define Machines_BITSPERWORD  32
+    			#endif
+
+	    Elegant\lib\rts\machines.spec
+		    line 37:
+			    Win32  : Int
+
+        Elegant\lib\rts\ansi.h
+            line 114:
+                //#if defined(WIN32) && !defined(_dos)
+                //#define _dos
+                //#endif
+            line 118: mod
+                #if defined(_dos) | defined (WIN32)
+
+        Elegant\lib\rts\DirStream.h
+            line 32: mod
+                #if defined(_dos) | defined(WIN32)
+                #include <msdir.h>
+                #else
+                #include <dirent.h>
+                #endif
+        Elegant\lib\rts\SystemTypes.h
+            line 53: add
+                #ifdef WIN32
+                #include "ts_Win32.h"
+                #endif
+        Elegant\lib\rts\ts_Win32.h: copy ts_dos.h
+            line 22: mod
+                #ifdef WIN32
+
+    Check WIN32 support
+
+        rts\msdir.c/h
+            uses _dos, _MSC_VER, and _WIN32,
+            defines MSDIR_MSDOS_INTERFACE | MSDIR_WIN32_INTERFACE
+
+        rts\ansi.h
+            uses _dos, WIN32
+
+port Elegant
+    ported from C sources
+
+	ts_win32.h created
+
+    Undef defines "lst1" and "lst2" defined by Windows.
+
+	Elegant\lib\rts\machines.h
+		line 86:
+			#ifdef WIN32
+			#undef lst1
+			#undef lst2
+			#endif
+		removed
+
+	Elegant\tools\Elegant\Grammar\Elegant.agdl
+		renamed "lst1" to "_lst1"
+		renamed "lst2" to "_lst2"
+
+    Self Build Okay, lots of warnings from Elegant and MSVC++
+
+Port ScanGen
+    ported from C source
+
+Port Front
+    ported from generated C source
+
+port ElegantMake
+    ported from C sources
+
+    Microsoft NMAKE mod
+	    Elegant\tools\ElegantMake\CGN\GenCode.impl
+		    line 140: translated ${...} to $(...)
+
+    ElegantMake.agdl compiles with 'not LL(1)' warnings, and some
+    output 'garbage' ?!?
+
+    Compile using -noparseroot, generates MakeRoot.c/h instead of
+    ElegantMakeRoot.c/h, add compile this and add to linker, aok.
+    MakeRoot.c contains main(), MakeRoot.h is empty.
+
+    ElegantMake generated from 7.1 source
+
+Port CMake
+    Ported CMake from Elegant Sources
+
+Modified
+========
+    Elegant\lib\rts\ansi.h
+    Elegant\lib\rts\machines.h
+    Elegant\lib\rts\DirStream.h
+    Elegant\lib\rts\SystemTypes.h
+    Elegant\tools\Elegant\Grammar\Elegant.agdl
+
+Created
+=======
+    Elegant\lib\rts\ts_Win32.h
+
+    Elegant\tools\Elegant\cgn\versions.h
+    Elegant\tools\ScanGen\cgn\versions.h
+    Elegant\tools\ElegantMake\cgn\versions.h
+    Elegant\tools\Front\cgn\versions.h
+    Elegant\tools\CMake\cgn\versions.h
+
+    Elegant\tools\Elegant\cgn\CGNInit.h
+    Elegant\tools\ScanGen\cgn\CGNInit.h
+    Elegant\tools\Front\cgn\CGNInit.h
+    Elegant\tools\CMake\cgn\CGNInit.h
+    Elegant\tools\ElegantMake\cgn\CGNInit.h
+
+    Elegant\tools\Elegant\cgn\CGNInit.c
+    Elegant\tools\ScanGen\cgn\CGNInit.c
+    Elegant\tools\Front\cgn\CGNInit.c
+    Elegant\tools\CMake\cgn\CGNInit.c
+    Elegant\tools\ElegantMake\cgn\CGNInit.c
+
+    Elegant\makefile                    prototype makefile.mak
+    Elegant\lib\preludes\makefile       prototype makefile.mak
+    Elegant\lib\rts\makefile            prototype makefile.mak
+    Elegant\lib\sd\makefile             prototype makefile.mak
+    Elegant\lib\generic\makefile        prototype makefile.mak
+    Elegant\tools\Elegant\makefile      prototype makefile.mak
+    Elegant\tools\ScanGen\makefile      prototype makefile.mak
+    Elegant\tools\Front\makefile        prototype makefile.mak
+    Elegant\tools\ElegantMake\makefile  prototype makefile.mak
+    Elegant\tools\CMake\makefile        prototype makefile.mak
+
+    Elegant\bin\Win32\Elegant.exe
+    Elegant\bin\Win32\ScanGen.exe
+    Elegant\bin\Win32\Front.exe
+    Elegant\bin\Win32\Elegant.exe
+    Elegant\bin\Win32\CMake.exe
+    Elegant\bin\Win32\BNF.exe
+
+
+Deleted
+=======
+
+    Elegant\tools\CMake\CGN\PatrhLib.spec - a blank copywrite header only
+
+
+---
+
+ToDo:
+    ElegantMake
+    CMake
+        Need porting to generate NMAKE files.
+
+    rewrite make files for GNU MAKE
+        use forward slash instead of backslash
+        use wildcard feature
+
+    GNU GCC port
+
+
+Bugs
+====
+
+DOS Filepath bug
+----------------
+
+Output of Backslash within DOS/Windows filepaths is being interpreted as a string meta
+character. And should either be normalized to a slash or translated into a double backslash.
+
+GenExpr.Missing
+    D:\elegant\tools\Elegant\CGN\GenExpr.impl |  1905 |
+        "TextIO_WriteString (SysStreams_sysErr, (string)\"Internal error:\"); "
+        "TextIO_NewLine (SysStreams_sysErr);" NL
+        "TextIO_WriteString (SysStreams_sysErr, (string)\"\\\"" file "\\\""
+
+GenExpr.Error
+    D:\elegant\tools\Elegant\CGN\GenExpr.impl |  1922 |
+        ScanIO.FindLocation (loc, line, pos, file)
+        "  TextIO_WriteString (SysStreams_sysErr, (string)\"Internal error: \"), "
+        "  TextIO_WriteString (SysStreams_sysErr, (string)\"\\\"" file "\\\""
+        ", line " line " " m "\\n\") ,"
+
+"Files.outputFilename" has been created as a quick fix it just duplicates any backslashes.
+It has been applied to "GenExpr.Missing" and "GenExpr.Error".
+
+
+ConvertToUnix is another possibility allowing normalization to Unix style path at output :)
+
+D:\elegant\tools\Elegant\CGN\GenExpr.impl
+      Files
+        Files.ConvertToUnix
+
+Normalization at "input" or source would be the most sensible solution.
+
+Multiple Compilation
+--------------------
+
+BNF and Front makefiles have bugs which are causing multiple compilation of
+intermediate targets. I am not totally sure what is going on as when a -d option
+to show details is used on NMAKE it does not exhibit the problem. So the problem
+maybe with NMAKE. Although a very simular makefile exists that does not show this
+problem.
+
+The problem is trivial and does not really affect building any targets only
+intoduces a small time delay. This problem should/will be solved at a later date.
+
+Errors
+======
+
+TypeModule.c
+    Errors:
+        C:\Elegant\tools\Elegant\CGN\TypeModule.c(1941) :
+            warning C4129: 'E' : unrecognized character escape sequence
+        C:\Elegant\tools\Elegant\CGN\TypeModule.c(1941) :
+            warning C4129: 'E' : unrecognized character escape sequence
+        C:\Elegant\tools\Elegant\CGN\TypeModule.c(1941) :
+            warning C4129: 'C' : unrecognized character escape sequence
+    line 1941:
+        "\"\Elegant\tools\Elegant\CGN/TypeModule.spec\", line 353   Type error occurred\n"
+
+TypeModule.spec
+    line 353:
+        LeftInAttr < Attribute { { num := Inc (rule astype RelationRule.numin) } }
+
+GenExpr.impl
+    line 943:
+        TypeError (x : AsExpr) complete
+            { "(" Error (loc, "  Type error occurred")", " Null (type)")"  }
+    line 1892:
+        attribute functions
+            Missing (m : (Match, report#NIL) out c)
+                ... file ...
+    line +: ... file ...
+
+    Fix:
+        Quick:
+            Back to unix paths.
+        Proper:
+            Find generation code, and fix.
+
+            GenExpr.impl
+
+                translate '... file ...' to '... CQuote( file) ...'
+
+                CQuote( s:Ident):Ident
+                    translates '\' to '\\'
+
+            Fix file name parsing for DOS and Unix normalization.
+
+                OSNormalizeFilePath( s:String):String
+                    translates all '\' or '/' to '/' or '\'
+
+        Or Possibly?:
+            "_dos" verses "WIN32" - needs double regeneration
+
+
+
+GCC, MingW verse MSVC++
+=======================
+    DJPGCC - unlikely, DOS is out of date.
+        Work as DOS Extender
+    GNU GCC - likely
+        gives MS independance with gnu make
+        Windows Executable
+    MSVC++ command line
+        The current development course
+
+Ideas
+=====
+
+    add output file directory switch
+
+    add path to elegant (CGNPATH/CGNLIB ?)
+	add wildcards to make utilities
+	better make system, or package files !
+
+Package files
+	Package/library files could be used to generate makefiles.
+
